@@ -50,6 +50,7 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
     private lateinit var ground: Ground
     private lateinit var background: Background
     private lateinit var scoreText: Score
+    private lateinit var groundBackground: GroundBackground
     private var paint = Paint()
 
     companion object {
@@ -123,6 +124,7 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
             //onTapListener = blockyDude.onTapListener
             addTo(addedCharacters)
         }
+        groundBackground = GroundBackground(Color.TRANSPARENT, dpToPx(context, GROUND_HEIGHT))
         overlay = Overlay()
         gameOverText = GameOverText("GAME OVER", Color.WHITE)
     }
@@ -140,6 +142,7 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
         ground.draw(context, paint, canvas)
         blockyDude?.draw(context, paint, canvas)
         blockyEnemy?.draw(context, paint, canvas)
+        groundBackground.draw(context, paint, canvas)
         if (isGameOver) {
             overlay?.draw(context, paint, canvas)
             gameOverText?.draw(context, paint, canvas)
@@ -149,7 +152,7 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
             if (it.action == MotionEvent.ACTION_DOWN) {
-                blockyDude?.click(event)
+                blockyDude?.click(event, false)
                 blockyEnemy?.click(event)
             }
             if (isGameOver) startGame()
@@ -256,18 +259,6 @@ class GameOverText(val text: String, color: Int) : Thing(color) {
     }
 }
 
-class Button(val text: String, color: Int) : Thing(color) {
-
-    private var rect = RectF()
-
-    override fun update() {}
-
-    override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
-        super.draw(context, paint, canvas)
-
-    }
-}
-
 class Ground(color: Int, val height: Float) : Thing(color) {
 
     override fun update() {}
@@ -278,6 +269,22 @@ class Ground(color: Int, val height: Float) : Thing(color) {
         canvas?.drawLine(0f, canvas.height - height, canvas.width.toFloat(),
             canvas.height - height, paint
         )
+    }
+}
+
+class GroundBackground(color: Int, val height: Float) : Thing(color) {
+
+    override fun update() {}
+
+    override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
+        super.draw(context, paint, canvas)
+        canvas?.let {
+            val linearGradient = LinearGradient(0f, it.height - height, it.width.toFloat(),it.height - height,
+                Color.parseColor("#02aab0"), Color.parseColor("#00cdac"), Shader.TileMode.REPEAT)
+            paint.shader = linearGradient
+            paint.isDither = true
+            it.drawRect(0f, it.height - height, it.width.toFloat(), it.height.toFloat(), paint)
+        }
     }
 }
 
@@ -305,7 +312,11 @@ open class Character(color: Int, open var x: Float, open var y: Float, open val 
         return 0f
     }
 
-    fun click(event: MotionEvent) {
+    fun click(event: MotionEvent, inside: Boolean = true) {
+        if (!inside) {
+            onTapListener?.invoke(this)
+            return
+        }
         if (event.x >= x && event.x <= x + width && event.y >= y && event.y <= y + height) {
             onTapListener?.invoke(this)
         }
