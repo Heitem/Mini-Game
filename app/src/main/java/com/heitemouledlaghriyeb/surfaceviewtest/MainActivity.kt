@@ -46,14 +46,16 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
     private var blockyDude: BlockyDude? = null
     private var blockyEnemy: BlockyEnemy? = null
     private var overlay: Overlay? = null
-    private var gameOverText: Text? = null
+    private var gameOverText: GameOverText? = null
     private lateinit var ground: Ground
     private lateinit var background: Background
+    private lateinit var scoreText: Score
     private var paint = Paint()
 
     companion object {
         var addedCharacters: ArrayList<Character> = arrayListOf()
         var isGameOver = false
+        var score = 0
     }
 
     init {
@@ -94,6 +96,7 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
         val enemyWidth = dpToPx(context, ENEMY_WIDTH)
         val enemyHeight = dpToPx(context, ENEMY_HEIGHT.toFloat())
         background = Background(Color.TRANSPARENT)
+        scoreText = Score(Color.WHITE)
         ground = Ground(Color.WHITE, dpToPx(context, GROUND_HEIGHT))
         blockyDude = BlockyDude(randomColor(), dpToPx(context, 100f), dpToPx(context, 5f),
             playerWidth.toInt(), playerHeight.toInt(), ground).apply {
@@ -108,6 +111,11 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
                 isGameOver = true
                 gameOver?.invoke()
             }
+
+            surpasses = {
+                score += 10
+                scoreText.score = score
+            }
             addTo(addedCharacters)
         }
         blockyEnemy = BlockyEnemy(Color.parseColor("#fe4042"), dpToPx(context, 700f), dpToPx(context, 10f),
@@ -116,7 +124,7 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
             addTo(addedCharacters)
         }
         overlay = Overlay()
-        gameOverText = Text("GAME OVER", Color.WHITE)
+        gameOverText = GameOverText("GAME OVER", Color.WHITE)
     }
 
     fun update() {
@@ -128,6 +136,7 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
     override fun draw(canvas: Canvas?) {
         super.draw(canvas)
         background.draw(context, paint, canvas)
+        scoreText.draw(context, paint, canvas)
         ground.draw(context, paint, canvas)
         blockyDude?.draw(context, paint, canvas)
         blockyEnemy?.draw(context, paint, canvas)
@@ -161,6 +170,7 @@ abstract class Thing(var color: Int) {
         canvas?.let {
             this.canvas = it
             paint.shader = null
+            paint.typeface = Typeface.DEFAULT
             paint.clearShadowLayer()
         }
     }
@@ -181,6 +191,33 @@ class Background(color: Int): Thing(color) {
     }
 }
 
+class Score(color: Int) : Thing(color) {
+
+    private var r = Rect()
+    var score: Int = 0
+
+    override fun update() {}
+
+    override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
+        super.draw(context, paint, canvas)
+        val text = score.toString()
+        paint.color = color
+        paint.textSize = spToPx(context, 18f)
+        paint.isAntiAlias = true
+        canvas?.getClipBounds(r)
+        val cHeight = r.height()
+        val cWidth = r.width()
+        paint.textAlign = Align.CENTER
+        paint.getTextBounds(text, 0, text.length, r)
+        val x = cWidth - r.width() - r.left - dpToPx(context, 16f)
+        val y = dpToPx(context, 32f)
+        paint.setShadowLayer(5f, dpToPx(context, 2f), dpToPx(context, 2f),
+            Color.argb(80, 0, 0, 0))
+        paint.isDither = true
+        canvas?.drawText(text, x, y, paint)
+    }
+}
+
 class Overlay(color: Int = Color.BLACK) : Thing(color) {
 
     private var alpha = 0
@@ -196,7 +233,7 @@ class Overlay(color: Int = Color.BLACK) : Thing(color) {
     }
 }
 
-class Text(val text: String, color: Int) : Thing(color) {
+class GameOverText(val text: String, color: Int) : Thing(color) {
 
     private var r = Rect()
 
@@ -292,6 +329,10 @@ class BlockyDude(color: Int, override var x: Float, override var y: Float, overr
                  override val height: Int, ground: Ground) : Character(color, x, y, width, height, ground) {
 
     var collided: (() -> (Unit))? = null
+    var surpasses: (() -> (Unit))? = null
+    companion object {
+        var surpassed = false
+    }
 
     override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
         super.draw(context, paint, canvas)
@@ -340,12 +381,27 @@ class BlockyDude(color: Int, override var x: Float, override var y: Float, overr
         }
 
         if (collided() && !GameSurface.isGameOver) collided?.invoke()
+        if (surpass() && !GameSurface.isGameOver) {
+            if (!surpassed) {
+                surpasses?.invoke()
+                surpassed = true
+            }
+        }
     }
 
     private fun collided(): Boolean {
         for (thing in GameSurface.addedCharacters) {
             if (thing != this) {
                 return (x + width >= thing.x && x < thing.x + thing.width && y + height >= thing.y)
+            }
+        }
+        return false
+    }
+
+    private fun surpass(): Boolean {
+        for (thing in GameSurface.addedCharacters) {
+            if (thing != this) {
+                return x >= thing.x + thing.width
             }
         }
         return false
@@ -361,8 +417,10 @@ class BlockyEnemy(color: Int, override var x: Float, override var y: Float, over
     override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
         super.draw(context, paint, canvas)
         paint.color = color
-        if (xx <= -width.toFloat())
+        if (xx <= -width.toFloat()) {
             xx = canvas?.width?.toFloat() ?: 0f
+            BlockyDude.surpassed = false
+        }
         x = xx
         paint.setShadowLayer(5f, dpToPx(context, 5f), dpToPx(context, 2f), Color.argb(80, 0, 0, 0))
         paint.isDither = true
