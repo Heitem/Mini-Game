@@ -124,6 +124,8 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
             //onTapListener = blockyDude.onTapListener
             addTo(addedCharacters)
         }
+
+        gameOver = { score = 0 }
         groundBackground = GroundBackground(Color.TRANSPARENT, dpToPx(context, GROUND_HEIGHT))
         overlay = Overlay()
         gameOverText = GameOverText("GAME OVER", Color.WHITE)
@@ -439,14 +441,14 @@ class BlockyEnemy(color: Int, override var x: Float, override var y: Float, over
     }
 
     override fun update() {
-        if (!isGrounded()) {
-            velocity += 0.5f
-            y += 1 * velocity
-            if (y + height >= groundHeight()) {
-                y = groundHeight() - height
-            }
-        } else {
-            context?.let {
+        context?.let {
+            if (!isGrounded()) {
+                velocity += dpToPx(it, 0.5f)
+                y += 1 * velocity
+                if (y + height >= groundHeight()) {
+                    y = groundHeight() - height
+                }
+            } else {
                 if (!GameSurface.isGameOver)
                     xx -= dpToPx(it, 5f)
             }
