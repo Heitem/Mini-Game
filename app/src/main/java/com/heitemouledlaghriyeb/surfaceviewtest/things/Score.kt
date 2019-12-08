@@ -8,15 +8,15 @@ import android.graphics.Rect
 import com.heitemouledlaghriyeb.surfaceviewtest.dpToPx
 import com.heitemouledlaghriyeb.surfaceviewtest.spToPx
 
-class Score(color: Int) : Thing(color) {
+class Score(context: Context, paint: Paint, color: Int) : Thing(context, paint, color) {
 
     private var r = Rect()
     var score: Int = 0
 
     override fun update() {}
 
-    override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
-        super.draw(context, paint, canvas)
+    override fun draw(canvas: Canvas?) {
+        super.draw(canvas)
         val text = score.toString()
         paint.color = color
         paint.textSize =

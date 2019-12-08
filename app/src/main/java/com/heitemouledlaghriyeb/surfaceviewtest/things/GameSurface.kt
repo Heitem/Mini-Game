@@ -35,8 +35,7 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
 
     init {
         holder.addCallback(this)
-        mainThread =
-            MainThread(holder, this)
+        mainThread = MainThread(holder, this)
         isFocusable = true
     }
 
@@ -67,46 +66,21 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
     fun startGame() {
         isGameOver = false
         addedCharacters = arrayListOf()
-        val playerWidth = dpToPx(
-            context,
-            PLAYER_WIDTH
-        )
-        val playerHeight = dpToPx(
-            context,
-            PLAYER_HEIGHT.toFloat()
-        )
-        val enemyWidth = dpToPx(
-            context,
-            ENEMY_WIDTH
-        )
-        val enemyHeight = dpToPx(
-            context,
-            ENEMY_HEIGHT.toFloat()
-        )
-        background =
-            Background(Color.TRANSPARENT)
-        scoreText =
-            Score(Color.WHITE)
-        ground = Ground(
-            Color.WHITE,
-            dpToPx(
-                context,
-                GROUND_HEIGHT
-            )
-        )
-        blockyDude = BlockyDude(
-            randomColor(),
-            dpToPx(context, 100f),
-            dpToPx(context, 5f),
-            playerWidth.toInt(), playerHeight.toInt(), ground
+        val playerWidth = dpToPx(context, PLAYER_WIDTH)
+        val playerHeight = dpToPx(context, PLAYER_HEIGHT.toFloat())
+        val enemyWidth = dpToPx(context, ENEMY_WIDTH)
+        val enemyHeight = dpToPx(context, ENEMY_HEIGHT.toFloat())
+        background = Background(context, paint, Color.TRANSPARENT)
+        scoreText = Score(context, paint, Color.WHITE)
+        ground = Ground(context, paint, Color.WHITE, dpToPx(context, GROUND_HEIGHT))
+        blockyDude = BlockyDude(context, paint, randomColor(), dpToPx(context, 100f),
+            dpToPx(context, 5f), playerWidth.toInt(), playerHeight.toInt(), ground
         ).apply {
             onTapListener = {
                 if (!isGameOver) {
-                    (it as BlockyDude).color =
-                        randomColor()
+                    (it as BlockyDude).color = randomColor()
                     if (currentState == State.Grounded)
-                        currentState =
-                            State.AboutToMove
+                        currentState = State.AboutToMove
                 }
             }
             collided = {
@@ -116,36 +90,21 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
 
             surpasses = {
                 score += 10
-                scoreText.score =
-                    score
+                scoreText.score = score
             }
             addTo(addedCharacters)
         }
-        blockyEnemy = BlockyEnemy(
-            Color.parseColor("#fe4042"),
-            dpToPx(context, 700f),
-            dpToPx(context, 10f),
-            enemyWidth.toInt(), enemyHeight.toInt(), ground
+        blockyEnemy = BlockyEnemy(context, paint, Color.parseColor("#fe4042"),
+            dpToPx(context, 700f), dpToPx(context, 10f), enemyWidth.toInt(), enemyHeight.toInt(), ground
         ).apply {
             //onTapListener = blockyDude.onTapListener
             addTo(addedCharacters)
         }
 
         gameOver = { score = 0 }
-        groundBackground =
-            GroundBackground(
-                Color.TRANSPARENT,
-                dpToPx(
-                    context,
-                    GROUND_HEIGHT
-                )
-            )
-        overlay = Overlay()
-        gameOverText =
-            GameOverText(
-                "GAME OVER",
-                Color.WHITE
-            )
+        groundBackground = GroundBackground(context, paint, Color.TRANSPARENT, dpToPx(context, GROUND_HEIGHT))
+        overlay = Overlay(context, paint)
+        gameOverText = GameOverText(context, paint, "GAME OVER", Color.WHITE)
     }
 
     fun update() {
@@ -156,15 +115,15 @@ class GameSurface @JvmOverloads constructor(context: Context, attrs: AttributeSe
 
     override fun draw(canvas: Canvas?) {
         super.draw(canvas)
-        background.draw(context, paint, canvas)
-        scoreText.draw(context, paint, canvas)
-        ground.draw(context, paint, canvas)
-        blockyDude?.draw(context, paint, canvas)
-        blockyEnemy?.draw(context, paint, canvas)
-        groundBackground.draw(context, paint, canvas)
+        background.draw(canvas)
+        scoreText.draw(canvas)
+        ground.draw(canvas)
+        blockyDude?.draw(canvas)
+        blockyEnemy?.draw(canvas)
+        groundBackground.draw(canvas)
         if (isGameOver) {
-            overlay?.draw(context, paint, canvas)
-            gameOverText?.draw(context, paint, canvas)
+            overlay?.draw(canvas)
+            gameOverText?.draw(canvas)
         }
     }
 

@@ -14,7 +14,7 @@ class MainThread(private var surfaceHolder: SurfaceHolder, private var gameSurfa
     }
 
     init {
-        //sleep(2000L)
+        sleep(2000L)
     }
 
     override fun run() {
@@ -45,7 +45,6 @@ class MainThread(private var surfaceHolder: SurfaceHolder, private var gameSurfa
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-
                 }
             }
 

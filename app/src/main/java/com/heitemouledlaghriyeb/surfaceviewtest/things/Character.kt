@@ -1,12 +1,14 @@
 package com.heitemouledlaghriyeb.surfaceviewtest.things
 
+import android.content.Context
+import android.graphics.Paint
 import android.view.MotionEvent
 import com.heitemouledlaghriyeb.surfaceviewtest.State
 import java.util.ArrayList
 
-open class Character(color: Int, open var x: Float, open var y: Float, open val width: Int,
+open class Character(context: Context, paint: Paint, color: Int, open var x: Float, open var y: Float, open val width: Int,
                      open val height: Int, private val ground: Ground
-) : Thing(color) {
+) : Thing(context, paint, color) {
 
     var onTapListener: ((Character) -> (Unit))? = null
     open var velocity = 0f

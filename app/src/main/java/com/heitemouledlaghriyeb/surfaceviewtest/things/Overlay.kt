@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 
-class Overlay(color: Int = Color.BLACK) : Thing(color) {
+class Overlay(context: Context, paint: Paint, color: Int = Color.BLACK) : Thing(context, paint, color) {
 
     private var alpha = 0
 
@@ -13,8 +13,8 @@ class Overlay(color: Int = Color.BLACK) : Thing(color) {
         if (alpha < 80) alpha += 5
     }
 
-    override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
-        super.draw(context, paint, canvas)
+    override fun draw(canvas: Canvas?) {
+        super.draw(canvas)
         paint.color = Color.argb(alpha, 0, 0, 0)
         canvas?.drawPaint(paint)
     }

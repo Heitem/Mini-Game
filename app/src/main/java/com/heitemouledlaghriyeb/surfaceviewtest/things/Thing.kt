@@ -5,15 +5,13 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
 
-abstract class Thing(var color: Int) {
+abstract class Thing(var context: Context, var paint: Paint, var color: Int) {
 
     protected var canvas: Canvas? = null
-    protected var context: Context? = null
 
     abstract fun update()
 
-    open fun draw(context: Context, paint: Paint, canvas: Canvas?) {
-        this.context = context
+    open fun draw(canvas: Canvas?) {
         canvas?.let {
             this.canvas = it
             paint.shader = null

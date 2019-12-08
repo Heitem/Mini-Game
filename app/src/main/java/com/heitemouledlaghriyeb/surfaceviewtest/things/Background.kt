@@ -3,12 +3,12 @@ package com.heitemouledlaghriyeb.surfaceviewtest.things
 import android.content.Context
 import android.graphics.*
 
-class Background(color: Int): Thing(color) {
+class Background(context: Context, paint: Paint, color: Int): Thing(context, paint, color) {
 
     override fun update() {}
 
-    override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
-        super.draw(context, paint, canvas)
+    override fun draw(canvas: Canvas?) {
+        super.draw(canvas)
         canvas?.let {
             val linearGradient = LinearGradient(0f, 0f, it.width.toFloat(), it.height.toFloat(),
                 Color.parseColor("#ff9a9e"), Color.parseColor("#fad0c4"), Shader.TileMode.REPEAT)

@@ -6,9 +6,9 @@ import android.graphics.Color
 import android.graphics.Paint
 import com.heitemouledlaghriyeb.surfaceviewtest.*
 
-class BlockyDude(color: Int, override var x: Float, override var y: Float, override val width: Int,
+class BlockyDude(context: Context, paint: Paint, color: Int, override var x: Float, override var y: Float, override val width: Int,
                  override val height: Int, ground: Ground
-) : Character(color, x, y, width, height, ground) {
+) : Character(context, paint, color, x, y, width, height, ground) {
 
     var collided: (() -> (Unit))? = null
     var surpasses: (() -> (Unit))? = null
@@ -16,8 +16,8 @@ class BlockyDude(color: Int, override var x: Float, override var y: Float, overr
         var surpassed = false
     }
 
-    override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
-        super.draw(context, paint, canvas)
+    override fun draw(canvas: Canvas?) {
+        super.draw(canvas)
         paint.color = color
         paint.setShadowLayer(5f,
             dpToPx(context, 5f),

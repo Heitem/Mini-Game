@@ -7,14 +7,14 @@ import android.graphics.Rect
 import android.graphics.Typeface
 import com.heitemouledlaghriyeb.surfaceviewtest.spToPx
 
-class GameOverText(val text: String, color: Int) : Thing(color) {
+class GameOverText(context: Context, paint: Paint, val text: String, color: Int) : Thing(context, paint, color) {
 
     private var r = Rect()
 
     override fun update() {}
 
-    override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
-        super.draw(context, paint, canvas)
+    override fun draw(canvas: Canvas?) {
+        super.draw(canvas)
         paint.color = color
         paint.textSize =
             spToPx(context, 40f)

@@ -6,15 +6,15 @@ import android.graphics.Color
 import android.graphics.Paint
 import com.heitemouledlaghriyeb.surfaceviewtest.dpToPx
 
-class BlockyEnemy(color: Int, override var x: Float, override var y: Float, override val width: Int,
+class BlockyEnemy(context: Context, paint: Paint, color: Int, override var x: Float, override var y: Float, override val width: Int,
                   override val height: Int, ground: Ground
-) : Character(color, x, y, width, height, ground) {
+) : Character(context, paint, color, x, y, width, height, ground) {
 
     override var velocity = 1f
     private var xx: Float = -width.toFloat()
 
-    override fun draw(context: Context, paint: Paint, canvas: Canvas?) {
-        super.draw(context, paint, canvas)
+    override fun draw(canvas: Canvas?) {
+        super.draw(canvas)
         paint.color = color
         if (xx <= -width.toFloat()) {
             xx = canvas?.width?.toFloat() ?: 0f
