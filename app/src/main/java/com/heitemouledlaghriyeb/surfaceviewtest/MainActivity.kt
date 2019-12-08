@@ -11,7 +11,6 @@ import kotlin.math.sqrt
 import android.graphics.Paint.Align
 
 
-
 const val PLAYER_WIDTH = 20f
 val PLAYER_HEIGHT = (1 + sqrt(5.0)) / 2 * PLAYER_WIDTH
 const val ENEMY_WIDTH = 30f
