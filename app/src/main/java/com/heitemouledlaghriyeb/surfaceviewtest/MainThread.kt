@@ -2,6 +2,7 @@ package com.heitemouledlaghriyeb.surfaceviewtest
 
 import android.graphics.Canvas
 import android.view.SurfaceHolder
+import com.heitemouledlaghriyeb.surfaceviewtest.things.GameSurface
 
 class MainThread(private var surfaceHolder: SurfaceHolder, private var gameSurface: GameSurface) : Thread() {
 
@@ -13,7 +14,7 @@ class MainThread(private var surfaceHolder: SurfaceHolder, private var gameSurfa
     }
 
     init {
-        sleep(2000L)
+        //sleep(2000L)
     }
 
     override fun run() {
